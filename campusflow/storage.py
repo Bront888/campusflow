@@ -10,7 +10,7 @@ from .tickets import calculate_priority
 
 
 class StorageError(Exception):
-    #Raised when ticket data cannot be safely loaded or saved.
+    """Raised when ticket data cannot be safely loaded or saved."""
 
 
 REQUIRED_FIELDS = {
