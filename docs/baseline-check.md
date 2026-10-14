@@ -6,9 +6,9 @@
 **Working tree:** Clean, according to the local check supplied by Engineer A  
 **Verification source:** Local terminal output supplied by Engineer A
 
-## Existing implementation
+## Existing implementation at the original baseline
 
-The current baseline includes:
+The original baseline included:
 
 - Ticket creation, field validation, and priority calculation.
 - Ticket lookup and ID allocation.
@@ -18,7 +18,7 @@ The current baseline includes:
 - JSON persistence with validation and clear storage errors.
 - A menu-driven CLI in `main.py`.
 
-## Automated test baseline
+## Original automated test baseline
 
 Command:
 
@@ -34,33 +34,47 @@ Ran 38 tests in 0.011s
 OK
 ```
 
-All 38 tests passed in the supplied output. This is a locally reported result; it has not been independently executed by the assistant environment.
+All 38 tests passed in the supplied output. This is a locally reported result; it was not independently executed in the assistant environment.
 
-## Coverage represented by the reported suite
+## Original branch decision
 
-- Ticket creation, normalization, invalid inputs, and priority boundaries.
-- Ticket lookup and increasing IDs.
-- JSON round trips, missing files, malformed JSON, invalid records, duplicate IDs, and save failures.
-- Assignment validation and resolved-ticket reassignment restrictions.
-- Workflow transition rules and explicit reopening.
-- Open queue filtering, sorting, and empty behavior.
-- Report counts and zero-safe empty reports.
+The local checkout reported `main...origin/main` with HEAD `c255a0f`. The integration branch `feat/3-cli-integration` had diverged from `main` (seven commits ahead and one behind at the time of comparison). Since the CLI integration commit was already present on `main`, `main` was selected as the canonical starting point.
 
-## Branch decision
+## CampusFlow Next integration checkpoint — 2026-10-14
 
-The local checkout reports `main...origin/main` with HEAD `c255a0f`. The integration branch `feat/3-cli-integration` was previously found to have diverged from `main` (seven commits ahead and one behind at the time of comparison). Since the CLI integration commit is already present on `main`, treat `main` as the canonical starting point for the new work. Do not merge the divergent integration branch into `main` without a fresh comparison and a concrete reason.
+The original baseline above is preserved as historical context; it is not a description of the current feature set.
 
-## Known gaps before the extension
+### Engineer A notes and storage validation
 
-The new extension must be built on the existing implementation, not as a replacement project. Requirements still to implement and verify:
+PR [#13](https://github.com/Bront888/campusflow/pull/13) merged into `main` on 2026-10-14. It added structured ticket notes, note validation during JSON persistence, legacy compatibility for records without a `notes` field, and regression tests. Merge commit: `a7d31c94bbdacf68958530b8456a2537b5a46dac`.
 
-- Structured ticket notes via `add_note(ticket_id, author, message)`.
-- Case-insensitive title substring search.
-- Combined category, status, and priority filters using AND semantics.
-- Reports with category counts, resolution percentage, and unresolved-ticket counts, while preserving existing status and priority reporting.
-- An Engineering Understanding Check.
-- Genuine AI learning records for each engineer, including independently verified corrections/rejections; no fabricated prompts or evidence.
+### Search, reports, CLI, and understanding check
 
-## Next verification
+PR [#15](https://github.com/Bront888/campusflow/pull/15) merged into `main` on 2026-10-14. It added case-insensitive title-substring search, AND-combined category/status/priority filters, category and resolution reporting, notes CLI actions, the six-question Engineering Understanding Check, focused tests, and pull-request CI.
 
-After the extension is integrated, rerun the full test suite on the integrated `main`, demonstrate the new behavior end to end, and update this record with the actual command output. Do not mark future checks complete before they are performed.
+GitHub Actions run [#38598070720](https://github.com/Bront888/campusflow/actions/runs/38598070720) passed on the PR head with the exact output:
+
+```
+Ran 75 tests in 0.016s
+
+OK
+```
+
+This run verifies the PR head before merge. The post-merge `main` verification must also pass before the sprint is called fully integrated.
+
+### Repeatable post-merge verification
+
+```bash
+git switch main
+git pull origin main
+git diff --check
+python -m unittest discover -s tests -v
+```
+
+When recording later verification, include the date, exact command, actual test count/output, branch, and commit. Do not invent missing output.
+
+## Remaining process requirements
+
+- Confirm the post-merge full-suite result on `main`.
+- Each engineer must record at least three genuine AI-learning interactions, including independent verification; do not fabricate prompts or evidence.
+- Dorcas's independent review was not completed while she was offline. The merge was performed without recording or implying her approval; arrange a genuine review when she returns.

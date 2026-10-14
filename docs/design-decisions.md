@@ -127,3 +127,46 @@ Test successful behavior and rejection cases: input normalization, invalid value
 ## 11. AI learning and verification
 
 Each engineer records at least three genuine AI learning interactions in `docs/ai-learning-log.md`. Each entry records the real prompt/question, what was tried or learned, how the result was independently verified, and the outcome in the engineer's own words. At least one entry must document a verified correction or rejection of an AI suggestion. Do not fabricate prompts, experiments, or verification evidence.
+
+
+## 12. CampusFlow Next extension contracts (2026-10-14)
+
+This section extends the original design without replacing the existing architecture. Where the extension adds behavior, this section supplements the earlier baseline contract.
+
+### Structured notes
+
+- `add_note(tickets, ticket_id, author, message) -> dict` returns the updated ticket.
+- Notes are stored in the ticket's `notes` list as `{"author": <trimmed string>, "message": <trimmed string>}`.
+- Author and message must be nonblank strings after trimming.
+- An unknown ticket ID raises `KeyError`; invalid note input or malformed existing notes raise `ValueError`.
+- A resolved ticket rejects note additions until it is explicitly reopened.
+- Persisted notes are validated on load/save. A missing `notes` field is allowed for legacy ticket records; malformed supplied notes raise `StorageError`.
+- Any rejected note operation must leave the entire ticket collection unchanged.
+
+### Search and combined filters
+
+- Title search uses case-insensitive substring matching.
+- Category, status, and priority filters are optional. When multiple filters are supplied, every supplied filter must match (AND semantics).
+- Search and filtering must not mutate or reorder the source ticket collection.
+
+### Extended reports
+
+Reports preserve the existing total, status, and priority counts and add category counts, resolution percentage, and unresolved-ticket count(s). Every supported category/status/priority should have a zero-valued key when empty. Empty input must produce a valid report without division by zero. The exact return shape should remain consistent across the implementation and its tests.
+
+### Engineering Understanding Check
+
+The sprint includes a six-question check covering the project's actual design and implementation. The CLI must handle answers, calculate a score, and show a result. See [engineering-understanding-check.md](engineering-understanding-check.md) for the documented question set and scoring guidance.
+
+### Current ownership
+
+For this sprint, Engineer A is Bront888 and Engineer B is Dorcas (`dinalegwu`). This current assignment supersedes the original ownership labels in Section 9 for the CampusFlow Next sprint only; the architecture and shared-contract rules above remain in force.
+
+### Sprint verification
+
+The required full-suite command is:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Record test outcomes only after the command has actually run on the relevant branch. The baseline record and post-merge verification status are tracked in [baseline-check.md](baseline-check.md). Each engineer must keep genuine AI-learning entries in [ai-learning-log.md](ai-learning-log.md); never fabricate prompts, experiments, or verification evidence.
