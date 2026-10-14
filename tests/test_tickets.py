@@ -144,6 +144,39 @@ class TicketTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             add_note(self.tickets, 999, "Bront888", "Investigating")
 
+    def test_resolved_ticket_rejects_note_without_mutation(self):
+        ticket = create_ticket(
+            self.tickets, "Wi-Fi outage", "Network", "high", 2
+        )
+        ticket["status"] = "resolved"
+        before = dict(ticket)
+
+        with self.assertRaises(ValueError):
+            add_note(
+                self.tickets,
+                ticket["id"],
+                "Bront888",
+                "Investigating",
+            )
+
+        self.assertEqual(ticket, before)
+
+    def test_malformed_existing_notes_rejected_without_mutation(self):
+        ticket = create_ticket(
+            self.tickets, "Wi-Fi outage", "Network", "high", 2
+        )
+        ticket["notes"] = "not a list"
+        before = dict(ticket)
+
+        with self.assertRaises(ValueError):
+            add_note(
+                self.tickets,
+                ticket["id"],
+                "Bront888",
+                "Investigating",
+            )
+
+        self.assertEqual(ticket, before)
 
 if __name__ == "__main__":
     unittest.main()

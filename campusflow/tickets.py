@@ -117,6 +117,11 @@ def add_note(tickets, ticket_id, author, message):
 
     ticket = find_ticket(tickets, ticket_id)
 
+    if ticket.get("status") == "resolved":
+        raise ValueError(
+            "Resolved tickets must be reopened before adding notes."
+        )
+
     if not isinstance(author, str) or not author.strip():
         raise ValueError("Note Author be blank.")
 
