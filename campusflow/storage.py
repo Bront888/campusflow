@@ -104,6 +104,33 @@ def _validate_tickets(tickets):
                 f"{location} has an invalid assigned_to value."
             )
 
+        # Notes are optional for backward compatibility.
+        notes = ticket.get("notes", [])
+
+        if not isinstance(notes, list):
+            raise StorageError(f"{location} has invalid notes.")
+
+        for note_index, note in enumerate(notes):
+            note_location = f"{location}, note at index {note_index}"
+
+            if not isinstance(note, dict):
+                raise StorageError(
+                    f"{note_location} must be an object."
+                )
+
+            author = note.get("author")
+            message = note.get("message")
+
+            if not isinstance(author, str) or not author.strip():
+                raise StorageError(
+                    f"{note_location} has an invalid author."
+                )
+
+            if not isinstance(message, str) or not message.strip():
+                raise StorageError(
+                    f"{note_location} has an invalid message."
+                )
+
 
 def load_tickets(path):
     # Load and validate tickets; a missing file means a fresh start.

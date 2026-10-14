@@ -1,6 +1,7 @@
 import unittest
 
 from campusflow.tickets import (
+    add_note,
     calculate_priority,
     create_ticket,
     find_ticket,
@@ -80,6 +81,69 @@ class TicketTests(unittest.TestCase):
     def test_find_unknown_ticket_raises_key_error(self):
         with self.assertRaises(KeyError):
             find_ticket(self.tickets, 99)
+
+    def test_add_note_trim_author_and_message(self):
+        ticket = create_ticket(
+            self.tickets, "Wifi Outage,", "Network", "high", 2
+        )
+
+        result = add_note(
+            self.tickets, ticket["id"], "  Bront888  ", "  Investigating  "
+        )
+
+        self.assertIs(result, ticket)
+        self.assertEqual(
+            ticket["notes"],
+            [{"author": "Bront888", "message": "Investigating"}],
+        )
+
+    def test_add_multiple_notes_preserves_existing_notes(self):
+        ticket = create_ticket(
+            self.tickets, "Wi-Fi outage", "Network", "high", 2
+        )
+
+        add_note(self.tickets, ticket["id"], "Alex", "First update")
+        add_note(self.tickets, ticket["id"], "Sam", "Second update")
+
+        self.assertEqual(
+            ticket["notes"],
+            [
+                {"author": "Alex", "message": "First update"},
+                {"author": "Sam", "message": "Second update"},
+            ],
+        )
+
+    def test_blank_author_is_rejected_without_mutation(self):
+        ticket = create_ticket(
+            self.tickets, "Wi-Fi outage", "Network", "high", 2
+        )
+        before = [dict(item) for item in self.tickets]
+
+        with self.assertRaises(ValueError):
+            add_note(self.tickets, ticket["id"], "   ", "Investigating")
+
+        self.assertEqual(self.tickets, before)
+
+    def test_blank_message_is_rejected_without_mutation(self):
+        ticket = create_ticket(
+            self.tickets, "Wi-Fi outage", "Network", "high", 2
+        )
+        before = [dict(item) for item in self.tickets]
+
+        with self.assertRaises(ValueError):
+            add_note(self.tickets, ticket["id"], "Bront888", "   ")
+
+        self.assertEqual(self.tickets, before)
+
+    def test_unknown_ticket_rejected_without_mutation(self):
+        create_ticket(
+            self.tickets, "Wi-Fi outage", "Network", "high", 2
+        )
+        before = [dict(item) for item in self.tickets]
+
+        with self.assertRaises(KeyError):
+            add_note(self.tickets, 999, "Bront888", "Investigating")
+
 
 if __name__ == "__main__":
     unittest.main()
