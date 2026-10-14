@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from campusflow.storage import StorageError, load_tickets, save_tickets
-from campusflow.tickets import create_ticket
+from campusflow.tickets import create_ticket, add_note
 
 
 class StorageTests(unittest.TestCase):
@@ -102,6 +102,79 @@ class StorageTests(unittest.TestCase):
 
         next_id = max(ticket["id"] for ticket in loaded) + 1
         self.assertEqual(next_id, 3)
+
+    def test_notes_survive_save_and_load(self):
+        ticket = self.tickets[0]
+        ticket["notes"] = [
+            {"author": "Bront888", "message": "Investigating the outage"}
+        ]
+
+        save_tickets(self.file_path, self.tickets)
+        loaded = load_tickets(self.file_path)
+
+        self.assertEqual(
+            loaded[0]["notes"],
+            [
+                {
+                    "author": "Bront888",
+                    "message": "Investigating the outage",
+                }
+            ],
+        )
+
+    def test_legacy_ticket_without_notes_still_loads(self):
+        legacy_ticket = dict(self.tickets[0])
+        legacy_ticket.pop("notes", None)
+
+        self.file_path.write_text(
+            json.dumps([legacy_ticket]),
+            encoding="utf-8",
+        )
+
+        loaded = load_tickets(self.file_path)
+
+        self.assertEqual(len(loaded), 1)
+        self.assertEqual(loaded[0]["id"], legacy_ticket["id"])
+        self.assertEqual(loaded[0].get("notes", []), [])
+
+    def test_invalid_notes_raise_storage_error(self):
+        invalid_ticket = dict(self.tickets[0])
+        invalid_ticket["notes"] = "not a list"
+
+        self.file_path.write_text(
+            json.dumps([invalid_ticket]),
+            encoding="utf-8",
+        )
+        with self.assertRaises(StorageError):
+            load_tickets(self.file_path)
+
+    def test_note_missing_author_is_rejected(self):
+        invalid_ticket = dict(self.tickets[0])
+        invalid_ticket["notes"] = [
+            {"message": "Investigating the outage"}
+        ]
+
+        self.file_path.write_text(
+            json.dumps([invalid_ticket]),
+            encoding="utf-8",
+        )
+
+        with self.assertRaises(StorageError):
+            load_tickets(self.file_path)
+
+    def test_blank_note_message_is_rejected(self):
+        invalid_ticket = dict(self.tickets[0])
+        invalid_ticket["notes"] = [
+            {"author": "Bront888", "message": "  "}
+        ]
+
+        self.file_path.write_text(
+            json.dumps([invalid_ticket]),
+            encoding="utf-8",
+        )
+
+        with self.assertRaises(StorageError):
+            load_tickets(self.file_path)
 
 
 if __name__ == "__main__":

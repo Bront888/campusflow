@@ -111,3 +111,35 @@ def create_ticket(tickets, title, category, urgency, affected_users):
 
     tickets.append(ticket)
     return ticket
+
+def add_note(tickets, ticket_id, author, message):
+    #Add a validated note to an existing ticket.
+
+    ticket = find_ticket(tickets, ticket_id)
+
+    if ticket.get("status") == "resolved":
+        raise ValueError(
+            "Resolved tickets must be reopened before adding notes."
+        )
+
+    if not isinstance(author, str) or not author.strip():
+        raise ValueError("Note Author be blank.")
+
+    if not isinstance(message, str) or not message.strip():
+        raise ValueError("Note message cannot be blank")
+
+    #Prepare the complete note before mutating the ticket.
+
+    note = {
+        "author": author.strip(),
+        "message": message.strip(),
+    }
+
+    #Older tickets may not have a note field.
+    existing_notes = ticket.get("notes", [])
+    if not isinstance(existing_notes, list):
+        raise ValueError("Ticket note must be list.")
+
+    ticket["notes"] = [*existing_notes, note]
+    return ticket
+
