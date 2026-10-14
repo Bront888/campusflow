@@ -64,3 +64,29 @@ The new extension must be built on the existing implementation, not as a replace
 ## Next verification
 
 After the extension is integrated, rerun the full test suite on the integrated `main`, demonstrate the new behavior end to end, and update this record with the actual command output. Do not mark future checks complete before they are performed.
+
+
+## Post-extension integration checkpoint — 2026-10-14
+
+The baseline above is a historical record of the pre-extension starting point. It is intentionally preserved rather than rewritten as though the extension had already existed at baseline.
+
+### Merged Engineer A work
+
+PR [#13](https://github.com/Bront888/campusflow/pull/13) was merged into `main` on 2026-10-14. It adds structured ticket notes, note validation during JSON persistence, legacy compatibility for records without a `notes` field, and regression tests. Merge commit: `a7d31c94bbdacf68958530b8456a2537b5a46dac`.
+
+Engineer A subsequently confirmed that the full test suite passed on the updated `main`. The exact terminal output and test count were not copied into this document, so this record deliberately does not claim a specific count.
+
+### Remaining sprint work at this checkpoint
+
+Engineer B's Issue [#11](https://github.com/Bront888/campusflow/issues/11) remains the tracked work item for case-insensitive title search, AND-combined filters, extended reports, notes CLI interaction, the six-question Engineering Understanding Check, and corresponding tests. Do not mark these features complete until the implementation is reviewed and the integrated suite is verified.
+
+### Repeatable verification
+
+```bash
+git switch main
+git pull origin main
+git diff --check
+python -m unittest discover -s tests -v
+```
+
+When recording a later verification, include the date, exact command, actual test count/output, branch, and commit. Do not invent missing output.
