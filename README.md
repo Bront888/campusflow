@@ -7,13 +7,13 @@ CampusFlow is a standard-library Python command-line ticket tracker developed fo
 - Create, view, validate, and prioritize support tickets.
 - Assign tickets and enforce the ticket lifecycle: `open -> in_progress -> resolved`, with explicit reopening.
 - Display an open-only queue sorted by priority and numeric ticket ID.
-- Generate reports with status and priority counts; the sprint extension adds category counts, resolution percentage, and unresolved-ticket counts.
+- Generate reports with status, priority, and category counts, resolution percentage, and unresolved-ticket counts.
 - Add structured ticket notes and validate note data during JSON persistence.
 - Search ticket titles case-insensitively and combine category, status, and priority filters using AND semantics.
 - Provide a six-question Engineering Understanding Check.
 - Persist ticket data to JSON with validation and clear storage errors.
 
-> The feature list above describes the intended sprint scope. Search, expanded reports, CLI additions, and the understanding check should be treated as complete only after Engineer B's implementation and integrated tests are verified.
+> The Issue #11 implementation and its tests are present in [PR #15](https://github.com/Bront888/campusflow/pull/15). GitHub Actions passed all 75 tests on that PR branch. The features are not yet part of `main`; complete review/merge and rerun the suite on the integrated branch before calling the sprint fully integrated.
 
 ## Constraints
 
@@ -44,4 +44,4 @@ See [docs/design-decisions.md](docs/design-decisions.md) for data contracts and 
 python -m unittest discover -s tests -v
 ```
 
-Run the full suite on the updated integration branch before declaring a sprint milestone complete. Record actual output only; do not infer a test count from an earlier run.
+Record actual output only; do not infer a test count from an earlier run.
