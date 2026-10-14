@@ -47,6 +47,77 @@ class GenerateReportTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             generate_report([{"status": "open", "priority": "urgent"}])
 
+    def test_report_counts_categories(self):
+        tickets = [
+            {
+                "status": "open",
+                "priority": "high",
+                "category": "Network",
+            },
+            {
+                "status": "resolved",
+                "priority": "low",
+                "category": "Hardware",
+            },
+            {
+                "status": "open",
+                "priority": "medium",
+                "category": "Network",
+            },
+        ]
+
+        report = generate_report(tickets)
+
+        self.assertEqual(
+            report["by_category"],
+            {
+                "Network": 2,
+                "Hardware": 1,
+                "Software": 0,
+                "Other": 0,
+            },
+        )
+
+    def test_report_counts_unresolved_tickets(self):
+        tickets = [
+            {"status": "open", "priority": "high"},
+            {"status": "in_progress", "priority": "medium"},
+            {"status": "resolved", "priority": "low"},
+        ]
+
+        report = generate_report(tickets)
+
+        self.assertEqual(report["unresolved"], 2)
+
+    def test_resolution_percentage(self):
+        tickets = [
+            {"status": "resolved", "priority": "high"},
+            {"status": "resolved", "priority": "low"},
+            {"status": "open", "priority": "medium"},
+            {"status": "in_progress", "priority": "high"},
+        ]
+
+        report = generate_report(tickets)
+
+        self.assertEqual(report["resolution_percentage"], 50.0)
+
+    def test_empty_report_has_zero_resolution_percentage(self):
+        report = generate_report([])
+
+        self.assertEqual(report["resolution_percentage"], 0.0)
+        self.assertEqual(report["unresolved"], 0)
+
+    def test_unknown_category_is_rejected(self):
+        tickets = [
+            {
+                "status": "open",
+                "priority": "low",
+                "category": "Food",
+            }
+        ]
+
+        with self.assertRaises(ValueError):
+            generate_report(tickets)
 
 if __name__ == "__main__":
     unittest.main()
