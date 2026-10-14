@@ -50,21 +50,16 @@ All 38 tests passed in the supplied output. This is a locally reported result; i
 
 The local checkout reports `main...origin/main` with HEAD `c255a0f`. The integration branch `feat/3-cli-integration` was previously found to have diverged from `main` (seven commits ahead and one behind at the time of comparison). Since the CLI integration commit is already present on `main`, treat `main` as the canonical starting point for the new work. Do not merge the divergent integration branch into `main` without a fresh comparison and a concrete reason.
 
-## Known gaps before the extension
+## Original extension requirements
 
-The new extension must be built on the existing implementation, not as a replacement project. Requirements still to implement and verify:
+The new extension must be built on the existing implementation, not as a replacement project. The original requirements were:
 
-- Structured ticket notes via `add_note(ticket_id, author, message)`.
+- Structured ticket notes via `add_note(tickets, ticket_id, author, message)`.
 - Case-insensitive title substring search.
 - Combined category, status, and priority filters using AND semantics.
 - Reports with category counts, resolution percentage, and unresolved-ticket counts, while preserving existing status and priority reporting.
 - An Engineering Understanding Check.
 - Genuine AI learning records for each engineer, including independently verified corrections/rejections; no fabricated prompts or evidence.
-
-## Next verification
-
-After the extension is integrated, rerun the full test suite on the integrated `main`, demonstrate the new behavior end to end, and update this record with the actual command output. Do not mark future checks complete before they are performed.
-
 
 ## Post-extension integration checkpoint — 2026-10-14
 
@@ -74,13 +69,25 @@ The baseline above is a historical record of the pre-extension starting point. I
 
 PR [#13](https://github.com/Bront888/campusflow/pull/13) was merged into `main` on 2026-10-14. It adds structured ticket notes, note validation during JSON persistence, legacy compatibility for records without a `notes` field, and regression tests. Merge commit: `a7d31c94bbdacf68958530b8456a2537b5a46dac`.
 
-Engineer A subsequently confirmed that the full test suite passed on the updated `main`. The exact terminal output and test count were not copied into this document, so this record deliberately does not claim a specific count.
+### Issue #11 implementation and verification
 
-### Remaining sprint work at this checkpoint
+The search, combined filters, extended reports, notes CLI, and six-question Engineering Understanding Check are implemented in [PR #15](https://github.com/Bront888/campusflow/pull/15). GitHub Actions run [#38598070720](https://github.com/Bront888/campusflow/actions/runs/38598070720) ran the full suite on the PR head using:
 
-Engineer B's Issue [#11](https://github.com/Bront888/campusflow/issues/11) remains the tracked work item for case-insensitive title search, AND-combined filters, extended reports, notes CLI interaction, the six-question Engineering Understanding Check, and corresponding tests. Do not mark these features complete until the implementation is reviewed and the integrated suite is verified.
+```bash
+python -m unittest discover -s tests -v
+```
 
-### Repeatable verification
+Actual output:
+
+```
+Ran 75 tests in 0.016s
+
+OK
+```
+
+This is verified on the PR branch, not yet on integrated `main`. Review/merge and a post-merge full-suite run remain necessary before declaring the integrated sprint complete.
+
+### Repeatable verification after integration
 
 ```bash
 git switch main
