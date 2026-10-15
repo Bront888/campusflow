@@ -177,5 +177,18 @@ class StorageTests(unittest.TestCase):
             load_tickets(self.file_path)
 
 
+    def test_unhashable_enum_fields_raise_storage_error(self):
+        for field in ("category", "urgency", "priority", "status"):
+            for invalid_value in ([], {}):
+                with self.subTest(field=field, invalid_value=invalid_value):
+                    invalid_ticket = dict(self.tickets[0])
+                    invalid_ticket[field] = invalid_value
+                    self.file_path.write_text(
+                        json.dumps([invalid_ticket]), encoding="utf-8"
+                    )
+
+                    with self.assertRaises(StorageError):
+                        load_tickets(self.file_path)
+
 if __name__ == "__main__":
     unittest.main()

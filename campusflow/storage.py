@@ -67,10 +67,10 @@ def _validate_tickets(tickets):
         if not isinstance(ticket["title"], str) or not ticket["title"].strip():
             raise StorageError(f"{location} has an invalid title.")
 
-        if ticket["category"] not in VALID_CATEGORIES:
+        if not isinstance(ticket["category"], str) or ticket["category"] not in VALID_CATEGORIES:
             raise StorageError(f"{location} has an invalid category.")
 
-        if ticket["urgency"] not in VALID_URGENCIES:
+        if not isinstance(ticket["urgency"], str) or ticket["urgency"] not in VALID_URGENCIES:
             raise StorageError(f"{location} has an invalid urgency.")
 
         users = ticket["affected_users"]
@@ -83,7 +83,7 @@ def _validate_tickets(tickets):
                 f"{location} has an invalid affected_users value."
             )
 
-        if ticket["priority"] not in VALID_PRIORITIES:
+        if not isinstance(ticket["priority"], str) or ticket["priority"] not in VALID_PRIORITIES:
             raise StorageError(f"{location} has an invalid priority.")
 
         expected_priority = calculate_priority(ticket["urgency"], users)
@@ -93,7 +93,7 @@ def _validate_tickets(tickets):
                 f"expected {expected_priority!r}."
             )
 
-        if ticket["status"] not in VALID_STATUSES:
+        if not isinstance(ticket["status"], str) or ticket["status"] not in VALID_STATUSES:
             raise StorageError(f"{location} has an invalid status.")
 
         assigned_to = ticket["assigned_to"]
